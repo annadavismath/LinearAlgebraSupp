@@ -1,0 +1,133 @@
+\documentclass{ximera}
+\input{../preamble.tex}
+
+\title{Systems} \license{CC BY-NC-SA 4.0}
+\begin{document}
+\begin{abstract}
+\end{abstract}
+\maketitle
+
+\section*{Octave Tutorial for Solving Systems of Equations}
+
+The templates in this section provide sample Octave code for solving systems of equations. You can access our code through the link at the bottom of each template.  Feel free to modify the code and experiment to learn more!  Alternatively, go to the \href{https://sagecell.sagemath.org/}{Sage Math Cell Webpage}, copy the code below into the cell, select OCTAVE as the language, and press EVALUATE.  
+
+\begin{template}\label{temp:systems1}
+Consider the system
+\begin{equation}
+\begin{array}{ccccccccc}
+      x &- &y&&&&&= &0 \\
+	 2x& -&2y&+&z&+&2w&=&4\\
+     & &y&&&+&w&=&0\\
+     & &&&2z&+&w&=&5
+    \end{array}
+    \end{equation}
+
+ (You may remember this system from \href{https://ximera.osu.edu/linearalgebrav3/LinearAlgebraInteractiveIntro/SYS-0020/main}{Augmented Matrix Notation and Elementary Row Operations}.)  We will solve this system with Octave.   
+\begin{verbatim}
+% Define the coefficient matrix A
+A = [1 -1 0 0;
+     2 -2 1 2;
+     0 1 0 1;
+     0 0 2 1];
+
+% Define vector b
+b = [0;4;0;5];
+
+% Solve the system 
+x = A \ b
+\end{verbatim}
+
+\href{https://sagecell.sagemath.org/?z=eJxFjsEKwjAQRO-B_Ye59FjYBD0FDwH_wGP1YMIGA7aBNpT69yZIcG-PeczsgKvEtAjKSxCyxJhCkqVgfpY1HXCkHC6YNEYNBltSaGcwGmiYzowW6z9yVfSjMqmhb-wSSl7hSfnWyfZk2Z67dMvv_ffH9tmKzCB1VM3hDv8FLh8nkA==&lang=octave&interacts=eJyLjgUAARUAuQ==}{Link to code}.
+
+\begin{warning}
+    The system above has a unique solution.  Try manipulating the system so that it has infinitely many solutions or no solutions.  Run the code to see what happens.  You will observe the following:
+
+\begin{itemize}
+    \item If a system has infinitely many solutions, Octave will find one particular solution.
+    \item If a system has no solutions, Octave will find an approximate solution using least-squares.  We will cover this method in \href{https://ximera.osu.edu/linearalgebrav3/LinearAlgebraInteractiveIntro/RTH-0030/main}{Least-Squares Approximation}.
+\end{itemize}
+\end{warning}
+
+\end{template}
+
+Due to how the backslash operator ($\setminus$) functions (see the warning above), we recommend that you solve systems by using the reduced row echelon form.  When solving systems by hand, you utilized Gauss-Jordan elimination to find rref.  Having the reduced row echelon form available made it easy to write out the solution(s) or determine that the system is inconsistent.  We can find rref and the rank of a matrix using Octave as follows.
+
+\begin{template}\label{temp:rref}
+We will use the same system of equations as in Template \ref{temp:systems1}.
+    \begin{verbatim}
+% Define the augmented matrix 
+% corresponding to the coefficient matrix A and vector b
+A_b = [1 -1 0 0 0;
+     2 -2 1 2 4;
+     0 1 0 1 0;
+     0 0 2 1 5];
+     
+% Find rref of A_b
+rref(A_b)
+
+% Find the rank of A_b
+rank(A_b)
+    \end{verbatim}
+
+\href{https://sagecell.sagemath.org/?z=eJxFjsEKwjAMhu-FvsN_Gehh0A49iYfB8CVEpOvSWWSt1Co-vumkmBCS_-cjSYOBnA-EfCOY17xQyDRhMTn5D2xMiZ6PGCYfZuS4UjaSc956JivXw4QJb7I5JoxS9NcRR5w1Wg1V8iAFSnRoO2huu-oo6F_9DYXC7C_VkaLByfMBfsYhOvB6KYrY8LSVgoUJ91V8ASwdNw8=&lang=octave&interacts=eJyLjgUAARUAuQ==}{Link to code}.    
+
+\begin{remark}
+    If you start with a matrix $A$ and a separate vector $\vec{b}$, you can create an augmented matrix without re-typing as follows:
+    \begin{verbatim}
+% Define the coefficient matrix A
+A = [1 -1 0 0;
+     2 -2 1 2;
+     0 1 0 1;
+     0 0 2 1];
+
+% Define vector b
+b = [0;4;0;5];
+
+% Create an augmented matrix
+A_b=[A b]
+    \end{verbatim}
+
+\href{https://sagecell.sagemath.org/?z=eJxFjrEKAyEQRHvBf5jmyoNVkkqukOQvjiOoWROL80BMyOdHIZLtHjvMvAlXjikz6pMRDo4xhcS5Yne1pA-sFBYLVoVZgUBGCvTTmDUU9GBCf6s_UouorbEU09h4c6hHgZfC904yJ0PmPEKXwq4yXIZ7PfbmwPefRXO4-WW18NsXtMsrmQ==&lang=octave&interacts=eJyLjgUAARUAuQ==}{Link to code}.
+    
+\end{remark}
+\end{template}
+
+\begin{warning}
+    The \emph{rref} function utilizes a modified version of the Gauss-Jordan elimination algorithm (\href{https://www.mathworks.com/help/matlab/ref/rref.html}{Reference Link}).  For some matrices, implementing this algorithm directly leads to round-off errors and other problems that are outside of the scope of this text.  While the backslash operator ($\setminus$) is a relatively robust operator, it too, can lead to computational problems.  We illustrate what can happen in the next example.   
+\end{warning}
+
+\begin{example}\label{ex:rrefFail}
+    We will use a $12\times 12$ Hilbert matrix to illustrate how the \emph{rref} function and the backslash operator ($\setminus$) can fail.  You can learn more about Hilbert matrices \href{https://en.wikipedia.org/wiki/Hilbert_matrix}{here}.
+
+\begin{verbatim}
+% Use a 12 by 12 Hilbert matrix
+A=hilb(12);
+
+% Theoretical rank of A is 12, but the following computation shows a rank of 11
+rank(A)
+
+% rref of A should be the identity matrix, but the following result contains a row of zeros
+rref(A)
+
+% We will now attempt to solve the system Ax=b, for the given b
+b=[1;1;1;1;1;1;1;1;1;1;1;1.1];
+
+% We'll use backslash to attempt to find a solution
+x=A\b
+
+% Test to see if Ax=b
+A*x
+
+\end{verbatim}
+
+\href{https://sagecell.sagemath.org/?z=eJxtkcFqwzAMhu8Gv4MuZe0og_RacshtD7Cxw7aDnSiNqGMXW26SPf2UpB07FIMxP9L__ZI38J4QDBQHsNN8v5KzGBl6w5FGraqyE2VbHHZHrbTawFuHISJTbRxE488QWqiAkjTvwWYG7hDa4FwYyJ-gDv0ls2EKHlIXhiSwe1tRaDW_t9Vu9Y4R29VPSrNrwOJiRw16Jp5uqR5xIqbsWHCeDfmFEobZ6wdjSMIR6z_OB8JAzoGXEsOM_UXsAqTgriswTUlUqMbS7gUSF_FEV_RgtbLlZ3F8eF6K7-Md8SSALMu1pj4nZ1I3I_7RWvKNxBRonrej1VhWX_a2ZExrIpTh2yWHfMXz-AvduIbw&lang=octave&interacts=eJyLjgUAARUAuQ==}{Link to code}.
+
+Observe that $A\vec{x}\neq\vec{b}$. 
+\end{example}
+
+\subsection*{Acknowledgements}
+
+The inspiration for Example \ref{ex:rrefFail} came from \href{https://stackoverflow.com/questions/42893111/matlab-rref-function-precision-error-after-12th-column-of-hilbert-matrices}{this} \emph{Stack Overflow} comment.
+
+  
+\end{document}
